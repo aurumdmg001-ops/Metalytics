@@ -84,7 +84,7 @@ export default function LeadAnalytics({ data }: { data: any[] }) {
   }, [data]);
 
   const generateReport = () => {
-    const wsData = stats?.zips.map(z => ({
+    const wsData = stats?.zips.map((z:any) => ({
       "Postal Code": z.zip,
       "Total Leads": z.total,
       "Verified (Inside)": z.verified,

@@ -16,7 +16,7 @@ export default function ControlBar({
       // Mapping data to clean headers for Excel
       const excelRows = data.map((item: any) => ({
         "Full Name": item.full_name,
-        "Phone Number": item.phone_number,
+        "Phone Number": item.phone,
         "City": item.city || "N/A",
         "Postal Code": item.postal_code,
         "Status": item.is_filtered ? "Verified" : "Outside Area",
@@ -54,7 +54,7 @@ export default function ControlBar({
           <button
             key={mode.id}
             onClick={() => setViewMode(mode.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-tighter transition-all duration-300 ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-tighter transition-all duration-300 cursor-pointer ${
               viewMode === mode.id 
               ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
               : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
@@ -70,7 +70,7 @@ export default function ControlBar({
       <div className="relative flex-1 max-w-md group">
         <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2">
           <Search className="text-zinc-500 group-focus-within:text-blue-500 transition-colors" size={18} />
-          <div className="h-4 w-[1px] bg-white/10" />
+          <div className="h-4 w-px bg-white/10" />
         </div>
         <input 
           type="text" 
@@ -91,14 +91,14 @@ export default function ControlBar({
             type="date" 
             value={startDate} 
             onChange={(e) => setStartDate(e.target.value)} 
-            className="bg-transparent text-[12px] text-zinc-300 outline-none hover:text-white transition-colors scheme-dark font-bold uppercase tracking-tighter" 
+            className="bg-transparent text-[12px] text-zinc-300 outline-none hover:text-white transition-colors scheme-dark font-bold uppercase tracking-tighter cursor-pointer" 
           />
-          <div className="w-2 h-[1px] bg-zinc-700" />
+          <div className="w-2 h-px bg-zinc-700" />
           <input 
             type="date" 
             value={endDate} 
             onChange={(e) => setEndDate(e.target.value)} 
-            className="bg-transparent text-[12px] text-zinc-300 outline-none hover:text-white transition-colors scheme-dark font-bold uppercase tracking-tighter" 
+            className="bg-transparent text-[12px] text-zinc-300 outline-none hover:text-white transition-colors scheme-dark font-bold uppercase tracking-tighter cursor-pointer" 
           />
           {(startDate || endDate) && (
             <button onClick={clearDates} className="ml-2 text-zinc-500 hover:text-red-500 transition-colors">
@@ -110,7 +110,7 @@ export default function ControlBar({
         {/* Verification Toggle */}
         <button 
           onClick={() => setFilterMode(filterMode === 'all' ? 'filtered' : 'all')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-2xl border transition-all text-[11px] font-black uppercase tracking-widest ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-2xl border transition-all text-[11px] font-black uppercase tracking-widest cursor-pointer ${
             filterMode === 'filtered' 
             ? 'bg-blue-600/10 border-blue-500 text-blue-500' 
             : 'bg-zinc-950 border-white/5 text-zinc-500 hover:text-zinc-200'
@@ -123,9 +123,9 @@ export default function ControlBar({
         {/* Export Button - Emerald Highlight */}
         <button 
           onClick={exportToExcel} 
-          className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 shadow-xl shadow-emerald-900/20 active:scale-95 group"
+          className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 shadow-xl shadow-emerald-900/20 active:scale-95 group cursor-pointer"
         >
-          <Download size={16} className="group-hover:translate-y-0.5 transition-transform" />
+          <Download size={16} className="group-hover:translate-y-0.5 transition-transform " />
           Export
         </button>
       </div>
