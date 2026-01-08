@@ -42,7 +42,7 @@ export default function LeadsList({ initialLeads }: { initialLeads: any[] }) {
     };
   }, [supabase]);
 
-  const displayData = useMemo(() => {
+const displayData = useMemo(() => {
     return leads.filter((lead) => {
       const matchesMode = filterMode === "all" ? true : lead.is_filtered;
       const searchLower = searchQuery.toLowerCase();
@@ -51,10 +51,16 @@ export default function LeadsList({ initialLeads }: { initialLeads: any[] }) {
         lead.postal_code?.includes(searchQuery) ||
         lead.city?.toLowerCase().includes(searchLower);
       
-      const leadDate = new Date(lead.created_at).toISOString().split("T")[0];
+      // FIX: UTC ki jagah Local Date extract karein (YYYY-MM-DD format mein)
+      const d = new Date(lead.created_at);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const leadLocalDate = `${year}-${month}-${day}`;
+
       const matchesDate =
-        (startDate ? leadDate >= startDate : true) &&
-        (endDate ? leadDate <= endDate : true);
+        (startDate ? leadLocalDate >= startDate : true) &&
+        (endDate ? leadLocalDate <= endDate : true);
       
       return matchesMode && matchesSearch && matchesDate;
     });
@@ -67,9 +73,10 @@ export default function LeadsList({ initialLeads }: { initialLeads: any[] }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen space-y-8 pb-20">
-      {/* 1. Control Hub - Glassmorphism style */}
-      <section className="sticky top-24 z-40">
+    <div className="flex flex-col min-h-screen space-y-4 md:space-y-8 pb-10 md:pb-20 transition-colors duration-300">
+      
+      {/* 1. Control Hub - Responsive Sticky */}
+      <section className="sticky top-16 md:top-24 z-40 w-full animate-in fade-in slide-in-from-top-4 duration-500">
         <ControlBar
           viewMode={viewMode}
           setViewMode={setViewMode}
@@ -86,46 +93,58 @@ export default function LeadsList({ initialLeads }: { initialLeads: any[] }) {
       </section>
 
       {/* 2. Main Display Area */}
-      <main className="flex-1 rounded-[2.5rem] border border-white/5 bg-zinc-900/20 backdrop-blur-sm overflow-hidden min-h-[500px]">
-        <div className="p-1 border-b border-white/5 bg-white/5 flex items-center px-8 py-3 justify-between">
-          <div className="flex items-center gap-2 text-zinc-500 font-bold text-[10px] uppercase tracking-widest">
-            <Layers size={14} className="text-blue-500" />
-            {displayData.length} Records Found
+      <main className="flex-1 rounded-[1.5rem] md:rounded-sm border border-gray-200 dark:border-border-custom bg-card/50 dark:bg-card/20 backdrop-blur-md overflow-hidden min-h-[400px] shadow-sm">
+        {/* Sub-Header info bar */}
+        <div className="border-b border-gray-200 dark:border-border-custom bg-gray-50/50 dark:bg-white/5 flex flex-col sm:flex-row items-start sm:items-center px-6 md:px-8 py-4 justify-between gap-2">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-zinc-500 font-bold text-[10px] uppercase tracking-widest">
+            <Layers size={14} className="text-primary-btn" />
+            <span className="text-foreground">{displayData.length}</span> Records Found
           </div>
-          <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
-            View: {viewMode}
+          <div className="text-[10px]  text-gray-700 dark:text-zinc-600 uppercase tracking-widest flex items-center gap-2">
+            View Mode: <span className="text-primary-btn bg-toggle dark:bg-primary-btn/10 px-2 py-0.5 rounded">{viewMode}</span>
           </div>
         </div>
         
-        <div className="p-6 transition-all duration-500 ease-in-out">
-          {viewMode === "whatsapp" && (
-            <ViewWhatsApp
-              data={displayData}
-              onSave={handleSaveNote}
-              savingId={savingId}
-              filterMode={filterMode}
-            />
-          )}
-          {viewMode === "card" && <ViewCards data={displayData} />}
-          {viewMode === "table" && <ViewTable data={displayData} />}
+        {/* View Switcher Container */}
+        <div className="p-2 md:p-6">
+          <div className="animate-in fade-in duration-500">
+            {viewMode === "whatsapp" && (
+              <ViewWhatsApp
+                data={displayData}
+                onSave={handleSaveNote}
+                savingId={savingId}
+                filterMode={filterMode}
+              />
+            )}
+            {viewMode === "card" && <ViewCards data={displayData} />}
+            {viewMode === "table" && (
+              <div className="overflow-x-auto custom-scrollbar">
+                <ViewTable data={displayData} />
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
-      {/* 3. Analytics Section - Lower visual priority but high detail */}
-      <section className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 mt-12 shadow-2xl">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="p-2 bg-emerald-500/10 rounded-xl">
-            <BarChart3 size={20} className="text-emerald-500" />
+      {/* 3. Analytics Section */}
+      <section className="bg-card border border-gray-200 dark:border-border-custom rounded-[1.5rem] md:rounded-sm p-6 md:p-10 mt-6 md:mt-12 shadow-sm transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 md:mb-12">
+          <div className="p-3 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-sm w-fit border border-emerald-500/20">
+            <BarChart3 size={24} className="text-emerald-600 dark:text-emerald-500" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tighter leading-tight">
-              Market Intelligence
+            <h2 className="text-2xl md:text-3xl  text-foreground tracking-tighter leading-tight">
+              Market <span className="text-emerald-600 dark:text-emerald-500">Intelligence</span>
             </h2>
-            <p className="text-zinc-500 text-xs font-medium">Data visualization based on current filtered results</p>
+            <p className="text-gray-500 dark:text-zinc-500 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1">
+               Visualizing real-time data trends
+            </p>
           </div>
         </div>
         
-        <LeadAnalytics data={displayData} />
+        <div className="w-full">
+          <LeadAnalytics data={displayData} />
+        </div>
       </section>
     </div>
   );
